@@ -31,3 +31,22 @@ module.exports.agregarProducto = (req, res) =>{
         return res.status(500).json({message:"Algo salió mal", error});
     })
 }
+
+module.exports.borrarProducto = (req, res) =>{
+    const id = req.params.id;
+    Producto.deleteOne({_id: id})
+    .then((productoRemovido) => {
+        console.log(productoRemovido);
+        return res.status(204).end();
+    })
+    .catch((error) => {
+        return res.status(500).json({mensaje: 'Algo salió mal', error})
+    });
+}
+
+module.exports.actualizarProducto = (req, res) =>{
+    const id = req.params.id;
+    Producto.findOneAndUpdate({_id: id}, req.body, {new:true})
+    .then(productoActualizado => res.status(200).json(productoActualizado))
+    .catch(err => res.json(err))
+}
