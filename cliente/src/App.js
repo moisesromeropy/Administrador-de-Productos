@@ -9,6 +9,7 @@ import FormularioEditarProducto from './FormularioEditarProducto/FormularioEdita
 function App() {
   const URL_BASE = "http://localhost:8000/api";
   const [productos, setProductos] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(()=>{
     const cargarProductos = () =>{
@@ -28,6 +29,25 @@ function App() {
   const agregarAProductos = (nuevoProducto) =>{
     setProductos([...productos, nuevoProducto]);
   }
+  const agregarAProductosBD = (productoNuevo, id) =>{
+    const url = `${URL_BASE}/productos/agregar`;
+        axios.post(url, 
+            productoNuevo,
+            {
+                headers:{
+                    'Content-Type':'application/json'
+                }
+            }
+        )
+          .then((response) => {
+            console.log(response);
+            agregarAProductos(response.data);
+          })
+          .catch(function (error) {
+            console.log(error);
+            setError(error);
+          });
+  }
 
   const editarProductos = (productoAEditar) =>{
     const indice = productos.findIndex((producto) => producto._id === productoAEditar._id);
@@ -38,6 +58,26 @@ function App() {
     setProductos(productosActualizados);
   }
 
+  const editarProductosBD = (productoEditado, id) => {
+    const url = `${URL_BASE}/productos/editar/${id}`;
+        axios.put(url, 
+            productoEditado,
+            {
+                headers:{
+                    'Content-Type':'application/json'
+                }
+            }
+        )
+          .then((response) => {
+            console.log(response);
+            editarProductos(response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+            setError(error);
+          });
+  }
+
   const borrarProductos = (id) => {
     const indice = productos.findIndex((producto) => producto._id === id);
     const productosActualizados = [...productos];
@@ -45,14 +85,15 @@ function App() {
     setProductos(productosActualizados);
   }
 
+
   return (
     <div className="App">
       
       <Routes>
         <Route path="/" element={<Productos productos={productos} URL_BASE={URL_BASE} borrarProductos={borrarProductos}/>} />
         <Route path="/:id" element={<DetalleProducto productos={productos} />} />
-        <Route path="/nuevo" element={<FormularioProductos URL_BASE={URL_BASE} agregarAProductos={agregarAProductos} />}/>
-        <Route path="/:id/editar" element={<FormularioEditarProducto URL_BASE={URL_BASE} editarProductos={editarProductos}/>}/>
+        <Route path="/nuevo" element={<FormularioProductos URL_BASE={URL_BASE}  funcionAEjecutar={agregarAProductosBD} />}/>
+        <Route path="/:id/editar" element={<FormularioProductos URL_BASE={URL_BASE} funcionAEjecutar={editarProductosBD} />}/>
       </Routes>
     </div>
   );

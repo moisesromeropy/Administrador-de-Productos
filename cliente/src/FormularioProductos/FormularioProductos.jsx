@@ -1,42 +1,27 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
-const FormularioProductos = ({URL_BASE, agregarAProductos}) => {
+import { useNavigate, useParams } from "react-router-dom";
+const FormularioProductos = ({URL_BASE, funcionAEjecutar}) => {
     const [productos, setProductos] = useState({title: "", price: 0, description: ""});
     const [error, setError] = useState("");
+    const {id} = useParams();
     const navegacion = useNavigate();
     const definirProductos = (valorNuevo, campo) =>{
         setProductos({...productos, [campo]: valorNuevo});
         
     }
 
-    const agregarEstudiante = (event) =>{
+    const procesarFuncion = (event) =>{
         event.preventDefault();
-        const url = `${URL_BASE}/productos/agregar`;
-        axios.post(url, 
-            productos,
-            {
-                headers:{
-                    'Content-Type':'application/json'
-                }
-            }
-        )
-          .then(function (response) {
-            console.log(response);
-            agregarAProductos(response.data);
-            setProductos({title: "", price: 0, description: ""});
-            setError("");
-            navegacion("/");
-          })
-          .catch(function (error) {
-            console.log(error);
-            setError(error);
-          });
+        funcionAEjecutar(productos, id);
+        setProductos({title: "", price: 0, description: ""});
+        setError("");
+        navegacion("/");
         
     }
     return(
         <>
-        <form onSubmit={agregarEstudiante}>
+        <form onSubmit={procesarFuncion}>
             <label htmlFor="title">Title</label>
             <input value={productos.title} id='title' name='title' onChange={(e) => definirProductos(e.target.value, "title")} type="text"/>
             <label htmlFor="price">Price</label>
